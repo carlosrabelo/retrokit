@@ -13,7 +13,7 @@ Ferramentas de linha de comando para converter imagens de fita cassete de comput
 
 ## Pré-requisitos
 
-- **Go 1.26+** — necessário para compilar a partir do código fonte
+- **Go 1.26+** — necessário para compilar a partir do código fonte; [download](https://go.dev/dl/)
 
 ## Instalação
 
@@ -25,10 +25,13 @@ cd retrokit
 make build
 ```
 
-Instale em `~/.local/bin` (sem necessidade de root):
+Instale em `~/.local/bin` (padrão), ou em todo o sistema em `/usr/local/bin` (sudo apenas para a cópia):
 
 ```bash
 make install
+make install-system
+make uninstall
+make uninstall-system
 ```
 
 ## Uso
@@ -90,34 +93,37 @@ retrokit machines
 ## Estrutura do Projeto
 
 ```
-cmd/retrokit/              # Ponto de entrada da CLI
-internal/
-    wav/                   # leitura/escrita/inspeção de WAV (compartilhado)
-    machine/               # interface Machine + registro
-        msx/               # implementação MSX
-        trs80/             # implementação TRS-80 (+ parser CMD)
-        all/               # registra todas as máquinas via init()
-    cas2wav/               # CAS para WAV (delega à Machine)
-    wav2cas/               # WAV para CAS (delega à Machine)
-    bin2cas/               # binário para CAS (delega à Machine)
-    cas2bin/               # CAS para binário (delega à Machine)
-    info/                  # inspeção de arquivos (delega à Machine)
+retrokit/                  # Código Go (cmd/internal)
+    cmd/retrokit/          # Ponto de entrada da CLI
+    internal/
+        wav/               # leitura/escrita/inspeção de WAV (compartilhado)
+        machine/           # interface Machine + registro
+            msx/           # implementação MSX
+            trs80/         # implementação TRS-80 (+ parser CMD)
+            all/           # registra todas as máquinas via init()
+        cas2wav/           # CAS para WAV (delega à Machine)
+        wav2cas/           # WAV para CAS (delega à Machine)
+        bin2cas/           # binário para CAS (delega à Machine)
+        cas2bin/           # CAS para binário (delega à Machine)
+        info/              # inspeção de arquivos (delega à Machine)
 bin/                       # Binários compilados (ignorados pelo git)
-.make/                    # Scripts de build e instalação
+.make/                     # Scripts de build e instalação
 ```
 
 ### Adicionando uma nova plataforma
 
-Implemente a interface `machine.Machine` em um novo pacote sob `internal/machine/<nome>/`, registre-o em `init()` e adicione um import em branco em `internal/machine/all/all.go`. Nenhum pacote de comando precisa mudar.
+Implemente a interface `machine.Machine` em um novo pacote sob `retrokit/internal/machine/<nome>/`, registre-o em `init()` e adicione um import em branco em `retrokit/internal/machine/all/all.go`. Nenhum pacote de comando precisa mudar.
 
 ## Desenvolvimento
 
 ```bash
-make build      # Compilar binário em bin/retrokit
-make test       # Executar todos os testes
-make fmt        # Formatar código
-make lint       # Executar linter
-make install    # Instalar em ~/.local/bin
+make build             # Compilar binário em bin/retrokit
+make test              # Executar todos os testes
+make quality           # Formatar, vet e lint
+make install           # Instalar binário em ~/.local/bin
+make install-system    # Instalar binário em /usr/local/bin
+make uninstall         # Remover de ~/.local/bin
+make uninstall-system  # Remover de /usr/local/bin
 ```
 
 ## Licença

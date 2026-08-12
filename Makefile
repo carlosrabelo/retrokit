@@ -2,18 +2,11 @@ MAKEFLAGS += --no-print-directory
 
 .DEFAULT_GOAL := help
 
-.PHONY: build clean fmt help install lint quality test uninstall
+.PHONY: build clean fmt help install install-system lint quality test uninstall uninstall-system
 
 BINARY_NAME := retrokit
 
-build: ## Build binary
-	@./.make/build.sh
-
-clean: ## Remove build artifacts
-	@./.make/clean.sh
-
-fmt: ## Format Go source code
-	@go fmt ./...
+export BINARY_NAME
 
 help: ## Show available targets
 	@echo "$(BINARY_NAME) - Available targets"
@@ -22,17 +15,32 @@ help: ## Show available targets
 		| sort \
 		| awk 'BEGIN {FS = ":.*## "} {printf "  %-15s %s\n", $$1, $$2}'
 
-install: build ## Install binary to ~/.local/bin
-	@./.make/install.sh
-
-lint: ## Run Go vet
-	@go vet ./...
-
-quality: ## Run all quality checks
-	@./.make/quality.sh
+build: ## Build the binary
+	@./.make/build.sh
 
 test: ## Run tests
 	@./.make/test.sh
 
-uninstall: ## Remove binary from ~/.local/bin
+lint: ## Run linter
+	@go vet ./...
+
+fmt: ## Format code
+	@go fmt ./...
+
+quality: ## Run all quality checks
+	@./.make/quality.sh
+
+clean: ## Remove build artifacts
+	@./.make/clean.sh
+
+install: ## Install to ~/.local/bin (requires prior make build)
+	@./.make/install.sh
+
+install-system: ## Install to /usr/local/bin (requires prior make build; sudo only for copy)
+	@SYSTEM=1 ./.make/install.sh
+
+uninstall: ## Remove from ~/.local/bin (sudo only if needed)
 	@./.make/uninstall.sh
+
+uninstall-system: ## Remove from /usr/local/bin (sudo only if needed)
+	@SYSTEM=1 ./.make/uninstall.sh

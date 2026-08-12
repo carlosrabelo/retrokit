@@ -13,7 +13,7 @@ Command-line tools for converting retro computer cassette tape images (CAS) to a
 
 ## Prerequisites
 
-- **Go 1.26+** — required to build from source
+- **Go 1.26+** — required to build from source; [download](https://go.dev/dl/)
 
 ## Installation
 
@@ -25,10 +25,13 @@ cd retrokit
 make build
 ```
 
-Install to `~/.local/bin` (no root required):
+Install to `~/.local/bin` (default), or system-wide to `/usr/local/bin` (sudo only for the copy):
 
 ```bash
 make install
+make install-system
+make uninstall
+make uninstall-system
 ```
 
 ## Usage
@@ -90,34 +93,37 @@ retrokit machines
 ## Project Layout
 
 ```
-cmd/retrokit/              # CLI entry point
-internal/
-    wav/                   # shared WAV read/write/inspect
-    machine/               # Machine interface + registry
-        msx/               # MSX implementation
-        trs80/             # TRS-80 implementation (+ CMD parser)
-        all/               # registers every machine via init()
-    cas2wav/               # CAS to WAV (delegates to Machine)
-    wav2cas/               # WAV to CAS (delegates to Machine)
-    bin2cas/               # binary to CAS (delegates to Machine)
-    cas2bin/               # CAS to binary (delegates to Machine)
-    info/                  # file inspection (delegates to Machine)
+retrokit/                  # Go source (cmd/internal)
+    cmd/retrokit/          # CLI entry point
+    internal/
+        wav/               # shared WAV read/write/inspect
+        machine/           # Machine interface + registry
+            msx/           # MSX implementation
+            trs80/         # TRS-80 implementation (+ CMD parser)
+            all/           # registers every machine via init()
+        cas2wav/           # CAS to WAV (delegates to Machine)
+        wav2cas/           # WAV to CAS (delegates to Machine)
+        bin2cas/           # binary to CAS (delegates to Machine)
+        cas2bin/           # CAS to binary (delegates to Machine)
+        info/              # file inspection (delegates to Machine)
 bin/                       # Compiled binaries (git-ignored)
-.make/                    # Build and install scripts
+.make/                     # Build and install scripts
 ```
 
-## Adding a new platform
+### Adding a new platform
 
-Implement the `machine.Machine` interface in a new package under `internal/machine/<name>/`, register it in `init()`, and add a blank import to `internal/machine/all/all.go`. No command package needs to change.
+Implement the `machine.Machine` interface in a new package under `retrokit/internal/machine/<name>/`, register it in `init()`, and add a blank import to `retrokit/internal/machine/all/all.go`. No command package needs to change.
 
 ## Development
 
 ```bash
-make build      # Compile binary to bin/retrokit
-make test       # Run all tests
-make fmt        # Format code
-make lint       # Run linter
-make install    # Install to ~/.local/bin
+make build             # Compile binary to bin/retrokit
+make test              # Run all tests
+make quality           # Format, vet, and lint
+make install           # Install binary to ~/.local/bin
+make install-system    # Install binary to /usr/local/bin
+make uninstall         # Remove from ~/.local/bin
+make uninstall-system  # Remove from /usr/local/bin
 ```
 
 ## License

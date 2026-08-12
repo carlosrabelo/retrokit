@@ -22,6 +22,8 @@ bin/*
 !bin/.gitkeep
 
 # Files
+/retrokit
+!/retrokit/
 coverage.out
 coverage.html
 
@@ -37,7 +39,6 @@ coverage.html
 *.swp
 *.swo
 *~
-*.swo
 
 # ============================================================================
 # OS
